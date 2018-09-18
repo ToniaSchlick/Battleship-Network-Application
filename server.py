@@ -2,7 +2,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 class MyHandler(BaseHTTPRequestHandler):
 
-	def do_GET(self):
+	def do_POST(self):
 		# Send response status code
 		self.send_response(200)
 
@@ -16,8 +16,6 @@ class MyHandler(BaseHTTPRequestHandler):
 		# Write content as utf-8 data
 		self.wfile.write(bytes(message, "utf8"))
 		return
-
-	# def do_POST(self):
 		
 
 def run(server_class=HTTPServer, handler_class=MyHandler, port=80):
