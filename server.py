@@ -1,50 +1,29 @@
-import socket
-import httplib
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+class MyHandler(BaseHTTPRequestHandler):
+
+	def do_GET(self):
+		# Send response status code
+		self.send_response(200)
+
+		# Send headers
+		self.send_header('Content-type','text/html')
+		self.end_headers()
+
+		# Send message back to client
+		message = "Battleship Network Application!"
+
+		# Write content as utf-8 data
+		self.wfile.write(bytes(message, "utf8"))
+		return
+
+	# def do_POST(self):
+		
+
+def run(server_class=HTTPServer, handler_class=MyHandler, port=80):
+    server_address = ('', 8000)
+    httpd = server_class(server_address, handler_class)
+    httpd.serve_forever()
 
 
-#Stablish connection between client and server using TCP.
-def stablishConnection():
-    s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    s.bind (('172.20.1.254', 8080))
-
-    s.listen(1)
-
-    conn, addr = s.accept()
-
-    data = conn.recv(64)
-    print("Received request: '" + data.decode('utf-8')+"'")
-
-    conn.send("Yes".encode('utf-8'))
-
-    conn.close()
-
-#create initial board and modificate the own_board.txt
-def createBoard(x, y):
-
-    line=[0 for i in range(10)]
-    line[0]="CCCCC_____\n"
-    line[1]="BBBB______\n"
-    line[2]="SSS_______\n"
-    line[3]="D_________\n"
-    line[4]="D_________\n"
-    line[5]="__________\n"
-    line[6]="__________\n"
-    line[7]="__________\n"
-    line[8]="__________\n"
-    line[9]="__________\n"
-
-    #Modificate the own_board.txt with the initial board
-    with open("own_board.txt", 'r+') as files:
-        files.writelines(line)
-
-    #Read every line in the own_board.txt    
-    with open("own_board.txt", 'r+') as files:
-        lines=files.readlines()
-        if lines[x][y]=="S":#check if something was hit (testing)
-            print "Hit"
-            
-
-
-createBoard(2,2)# Random number for testing
-
+run()
