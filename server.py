@@ -1,5 +1,4 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import simplejson
 
 STotal=0
 CTotal=0
