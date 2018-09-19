@@ -1,55 +1,76 @@
-import socket
-import httplib
-
-
-#Stablish connection between client and server using TCP.
-def stablishConnection():
-    s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    s.connect (('172.20.1.254', 8080))
-
-    s.send("Are you there?".encode('utf-8'))
-
-    data = s.recv(64)
-    print("Received response: '" + data.decode('utf-*')+"'")
-
-    s.close()
+import requests
 
 def startGame():
-    x=userInputX()
-    y=userInputY()
+       
+    x=input('Select x from 0-9: ')
+    y=input('Select y from 0-9: ')
+    print("")
 
-    URL=("http://172.20.1.254?x=" + str(x) + "&y=" + str(y))
-    print(URL)
+    r = requests.post('http://localhost:8000?', "x=" + x + "&y=" + y)
+    print(r.url)
+    print(r.text) #Get response
+    print("")
     
-#Ask for user input x-coordinate.   
-def userInputX():
-    i=0
-    while i==0:#while x-coordinate is not inside the bounds.
-
-        #Ask for x-coordinates input.
-        xC=input("Choose x coordinate between 0 and 9: ")
-        type(xC)
+    opponentBoard(x,y,r)# Update opponent board
+    
+    while (r.text!="You Won! Game Over"): # Keep program running until the game is over
+        print("")
+        x=input('Select x from 0-9')
+        y=input('Select y from 0-9')
+        print("")
         
-        if xC<=9 and xC>=0: #Check if the input is inside the bounds.
-            i=1
-        else: #If input is not inside bounds.
-            print("The coordinate have to be between 0 and 9. Try again")
-    return xC
-
-#Ask for user input y-coordinate.
-def userInputY():
-    j=0
-    while j==0:#while y-coordinate is not inside the bounds.
-        #Ask for y-coordinates input.
-        yC=input("Choose y coordinate between 0 and 9: ")
-        type(yC)
+        r = requests.post('http://localhost:8000', "x=" + x + "&y=" + y)
+        print(r.url)
+        print(r.text)
+        print("")
         
-        if yC<=9 and yC>=0: #Check if the input is inside the bounds.
-            j=1
-        else: #If input is not inside bounds.
-            print("The coordinate have to be between 0 and 9. Try again")
-    return yC
+        opponentBoard(x,y,r)
 
+def opponentBoard(x,y,r):
+     if r.text=="Hit=1" or r.text=="Hit=1\&sink=S" or r.text=="Hit=1\&sink=C" or r.text=="Hit=1\&sink=B" or r.text=="Hit=1\&sink=R" or r.text=="Hit=1\&sink=D":
+        #change opponent_board for O (hit)
+         
+        with open("opponent_board.txt", 'r+') as files:
+            
+            lines=files.readlines()
+            
+            s= list(lines[int(x)])
+            s[int(y)]='O'
+            lines[int(x)]="".join(s)
+            
+            with open("opponent_board.txt", 'r+') as files:
+                files.writelines(lines)
+                
+     elif r.text=="Hit=0":
+        #change opponent_board for X (miss)
+        with open("opponent_board.txt", 'r+') as files:
+            
+            lines=files.readlines()
+            s= list(lines[int(x)])
+            s[int(y)]='X'
+            lines[int(x)]="".join(s)
+            
+            with open("opponent_board.txt", 'r+') as files:
+                files.writelines(lines)
 
+def initializeOpponent():
+    line=[0 for i in range(10)]
+    line[0]="__________\n"
+    line[1]="__________\n"
+    line[2]="__________\n"
+    line[3]="__________\n"
+    line[4]="__________\n"
+    line[5]="__________\n"
+    line[6]="__________\n"
+    line[7]="__________\n"
+    line[8]="__________\n"
+    line[9]="__________\n"
+
+    
+    #Modificate the opponent_board.txt with the initial board
+    with open("opponent_board.txt", 'r+') as files:
+        files.writelines(line)
+        
+initializeOpponent()
 startGame()
+
