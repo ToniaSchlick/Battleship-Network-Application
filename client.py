@@ -1,9 +1,14 @@
+
 import requests
 import json
 
+def update(x, y):
+        payload = {'x': x, 'y': y}
+        r = requests.post('http://localhost:8000/opponent_board.html', data=json.dumps(payload))
+        print(r.url)
+        print(r.text)
 def startGame(): 
 	playing = True 
-	
 	while (playing == True): # Keep program running until the game is over
 		print("")
 		x=input('Select x from 0-9: ')
@@ -17,7 +22,7 @@ def startGame():
 		if (r.text == "You Won! Game Over"):
 			playing = False
 		print("")
-		
+		update(x, y)
 		opponentBoard(x,y,r)
 
 def opponentBoard(x,y,r):
@@ -67,4 +72,3 @@ def initializeOpponent():
 		
 initializeOpponent()
 startGame()
-
