@@ -19,7 +19,22 @@ class MyHandler(BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type','text/html')
                 self.end_headers()
-                self.wfile.write("<h1>Hel</h1>".encode("utf-8"))
+                if self.path=='/own_board.txt':
+                        
+                        with open("own_board.txt", 'r+') as files:
+                                lines=files.readlines()
+                                for i in range(10):
+                                        file_to_open = (lines[i] + "<br />")
+                                        self.wfile.write(file_to_open.encode("utf-8"))
+                else:
+                        with open("opponent_board.txt", 'r+') as files:
+                                lines=files.readlines()
+                                for i in range(10):
+                                        file_to_open = (lines[i] + "<br />")
+                                        self.wfile.write(file_to_open.encode("utf-8"))
+                                
+                                
+                
 
                 
 
