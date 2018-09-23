@@ -17,27 +17,63 @@ class MyHandler(BaseHTTPRequestHandler):
         def do_GET(self):
                 # Send response status code
                 self.send_response(200)
-                # Send headers
-                self.wfile.write(bytes("<embed src=""own_board.txt"">", "utf-8"))
-                print("Connection")
+                self.send_header('Content-type','text/html')
+                self.end_headers()
+                if self.path=='/own_board.html':
+                        
+                        with open("own_board.txt", 'r+') as files:
+                                lines=files.readlines()
+                                for i in range(10):
+                                        file_to_open = (lines[i] + "<br />")
+                                        self.wfile.write(file_to_open.encode("utf-8"))
+                else:
+                        with open("opponent_board.txt", 'r+') as files:
+                                lines=files.readlines()
+                                for i in range(10):
+                                        file_to_open = (lines[i] + "<br />")
+                                        self.wfile.write(file_to_open.encode("utf-8"))
+                                
+                                
+                
+
+                
 
         def do_POST(self):
                 # Send response status code
-                self.send_response(200)
-
-                # Send headers
-                self.send_header('Content-type','text/html')
-                self.end_headers()
-                
-                # Extract move from http post
+                 # Extract move from http post
                 self.data_string = self.rfile.read(int(self.headers['Content-Length']))
                 data = json.loads(self.data_string)
                 print ("{}".format(data))
                 print (data['x'], data['y'])
 
-                # Random number for testing
-                # until be able to read the actual desire values that were send
-                message = createBoard(data['x'], data['y'])
+                if(data['x'].isnumeric()==0 or data['y'].isnumeric()==0):
+                        message="HTTP Bad Request"
+                        self.send_response(400)
+                        
+                         # x or y ou of bounds
+                elif int(data['x'])>9 or int(data['y'])>9:
+                        message="HTTP Not Found"
+                        self.send_response(404)
+                else:
+                #Read every line in the own_board.txt    
+                        with open("own_board.txt", 'r+') as files:
+                                lines=files.readlines()
+                                s= list(lines[int(data['x'])])
+                
+                # Location have alreay been fire
+                                if lines[int(data['x'])][int(data['y'])]=="X" or lines[int(data['x'])][int(data['y'])]=="O":
+                                        message="HTTP Gone"
+                                        self.send_response(410)
+                                else:
+               
+                                        message = createBoard(data['x'], data['y'])
+                                        self.send_response(200)
+
+                # Send headers
+                self.send_header('Content-type','text/html')
+                self.end_headers()
+                
+               
                 
                 # Write content as utf-8 data and
                 # Send message back to client
@@ -79,28 +115,13 @@ def createBoard(x, y):
         global RTotal
         global DTotal
 
-        if(x.isnumeric()==0 or y.isnumeric()==0):
-                                message="HTTP Bad Request"
-                                return message
-                         # x or y ou of bounds
-        if int(x)>9 or int(y)>9:
-                                message="HTTP Not Found"
-                                return message
-        
         #Read every line in the own_board.txt    
         with open("own_board.txt", 'r+') as files:
                 lines=files.readlines()
                 s= list(lines[int(x)])
                 
-                # Missing the HTTP bad request response
-                # Thinking on using the isnumeric() function to check for Bad Request
-
-                # Location have alreay been fire
-                if lines[int(x)][int(y)]=="X" or lines[int(x)][int(y)]=="O":
-                                message="HTTP Gone"
-
                 # If the Submarine was hit
-                elif lines[int(x)][int(y)]=="S":
+                if lines[int(x)][int(y)]=="S":
                                 STotal=STotal+1 #Increase number of time that Submarine have been hit
                                 
                                 s[int(y)]='O'

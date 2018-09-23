@@ -1,4 +1,3 @@
-
 import requests
 import json
 
@@ -22,7 +21,6 @@ def startGame():
 		if (r.text == "You Won! Game Over"):
 			playing = False
 		print("")
-		update(x, y)
 		opponentBoard(x,y,r)
 
 def opponentBoard(x,y,r):
