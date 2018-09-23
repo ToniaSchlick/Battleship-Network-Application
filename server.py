@@ -19,7 +19,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type','text/html')
                 self.end_headers()
-                if self.path=='/own_board.txt':
+                if self.path=='/own_board.html':
                         
                         with open("own_board.txt", 'r+') as files:
                                 lines=files.readlines()
